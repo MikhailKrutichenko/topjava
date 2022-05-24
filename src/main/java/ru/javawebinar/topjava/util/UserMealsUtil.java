@@ -108,10 +108,10 @@ public class UserMealsUtil {
                     @Override
                     public Function<Map<LocalDate, DailyMeals>, List<UserMealWithExcess>> finisher() {
                         return map -> map.values().stream()
-                                .flatMap(s -> s.getUserMeals().stream()
+                                .flatMap(dm -> dm.getUserMeals().stream()
                                         .filter(m -> TimeUtil.isBetweenHalfOpen(m.getDateTime().toLocalTime(), startTime, endTime))
                                         .map(m -> new UserMealWithExcess(m.getDateTime(), m.getDescription(), m.getCalories(),
-                                                s.sumCalories > caloriesPerDay)))
+                                                dm.sumCalories > caloriesPerDay)))
                                 .collect(Collectors.toList());
                     }
 
