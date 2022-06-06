@@ -16,7 +16,6 @@ public class MemoryMealCrud implements CRUD<Meal> {
 
     {
         for (Meal meal : MealsUtil.getMeals()) {
-            meal.setId(idCounter.getAndIncrement());
             create(meal);
         }
     }
