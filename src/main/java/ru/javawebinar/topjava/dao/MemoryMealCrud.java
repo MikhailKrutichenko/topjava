@@ -48,6 +48,7 @@ public class MemoryMealCrud implements CRUD<Meal> {
     @Override
     public Meal create(Meal entity) {
         entity.setId(idCounter.getAndIncrement());
-        return meals.put(entity.getId(), entity);
+        meals.put(entity.getId(), entity);
+        return entity;
     }
 }
