@@ -5,11 +5,11 @@ import java.util.List;
 public interface CRUD<E> {
     List<E> getAll();
 
-    E getById(Integer id);
+    E getById(int id);
 
-    E update(E entity);
+    E update(int id, E entity);
 
-    E delete(Integer id);
+    boolean delete(int id);
 
     E create(E entity);
 }
