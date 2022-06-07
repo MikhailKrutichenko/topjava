@@ -9,15 +9,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MemoryMealCrud implements CRUD<Meal> {
-
+public class MemoryMealCrud implements Crud<Meal> {
     private final AtomicInteger idCounter = new AtomicInteger();
     private final Map<Integer, Meal> meals = new ConcurrentHashMap<>();
 
     {
-        for (Meal meal : MealsUtil.getMeals()) {
-            create(meal);
-        }
+        MealsUtil.getMeals().forEach(this::create);
     }
 
     @Override
@@ -31,12 +28,8 @@ public class MemoryMealCrud implements CRUD<Meal> {
     }
 
     @Override
-    public Meal update(int id, Meal entity) {
-        entity.setId(id);
-        if (meals.replace(id, entity) != null) {
-            return entity;
-        }
-        return null;
+    public Meal update(Meal entity) {
+        return meals.replace(entity.getId(), entity) == null ? null : entity;
     }
 
     @Override

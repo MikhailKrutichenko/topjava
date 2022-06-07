@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MealsUtil {
-
     public static final int NORM_CALORIES = 2000;
 
     private static final List<Meal> meals = Arrays.asList(

@@ -2,12 +2,12 @@ package ru.javawebinar.topjava.dao;
 
 import java.util.List;
 
-public interface CRUD<E> {
+public interface Crud<E> {
     List<E> getAll();
 
     E getById(int id);
 
-    E update(int id, E entity);
+    E update(E entity);
 
     boolean delete(int id);
 

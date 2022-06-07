@@ -6,7 +6,7 @@
 <body>
 <h3><a href="index.html">Home</a></h3>
 <hr>
-<form action="meals?action=${param.action}&id=${param.id}" method="POST">
+<form action="meals" method="POST">
     <table>
         <tr>
             <td>DateTime:</td>
@@ -20,6 +20,7 @@
             <td>Calories:</td>
             <td><input type="number" name="calories" value="${meal.calories}"/></td>
         </tr>
+        <input type="hidden" name="id" value="${param.id}">
     </table>
     <br/>
     <input type="submit" value="Submit"/>
