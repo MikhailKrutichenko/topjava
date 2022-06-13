@@ -24,8 +24,7 @@ public class MealServlet extends HttpServlet {
     private MealRestController controller;
 
     @Override
-    public void init() throws ServletException {
-        super.init();
+    public void init() {
         context = new ClassPathXmlApplicationContext("spring/spring-app.xml");
         controller = context.getBean(MealRestController.class);
         log.info("create context:", context);
@@ -34,36 +33,25 @@ public class MealServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-        String filter = request.getParameter("filter");
-        if (filter != null && filter.equals("true")) {
-            List<MealTo> meals = controller.getAll(request.getParameter("startDate"),
-                    request.getParameter("endDate"),
-                    request.getParameter("startTime"),
-                    request.getParameter("endTime"));
-            request.setAttribute("meals", meals);
-            request.getRequestDispatcher("/meals.jsp").forward(request, response);
+        String id = request.getParameter("id");
+        Meal meal = new Meal(id.isEmpty() ? null : Integer.parseInt(id),
+                LocalDateTime.parse(request.getParameter("dateTime")),
+                request.getParameter("description"),
+                Integer.parseInt(request.getParameter("calories")),
+                null);
+        if (meal.isNew()) {
+            log.info("Create {}", meal);
+            controller.create(meal);
         } else {
-            String id = request.getParameter("id");
-            Meal meal = new Meal(id.isEmpty() ? null : Integer.parseInt(id),
-                    LocalDateTime.parse(request.getParameter("dateTime")),
-                    request.getParameter("description"),
-                    Integer.parseInt(request.getParameter("calories")),
-                    SecurityUtil.authUserId());
-            if (meal.isNew()) {
-                log.info("Create {}", meal);
-                controller.create(meal);
-            } else {
-                log.info("Update {}", meal);
-                controller.update(meal, meal.getId());
-            }
-            response.sendRedirect("meals");
+            log.info("Update {}", meal);
+            controller.update(meal, meal.getId());
         }
+        response.sendRedirect("meals");
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-
         switch (action == null ? "all" : action) {
             case "delete":
                 int id = getId(request);
@@ -74,10 +62,18 @@ public class MealServlet extends HttpServlet {
             case "create":
             case "update":
                 final Meal meal = "create".equals(action) ?
-                        new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000, SecurityUtil.authUserId()) :
+                        new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000, null) :
                         controller.get(getId(request));
                 request.setAttribute("meal", meal);
                 request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
+                break;
+            case "filter":
+                List<MealTo> meals = controller.getAllByFilter(request.getParameter("startDate"),
+                        request.getParameter("endDate"),
+                        request.getParameter("startTime"),
+                        request.getParameter("endTime"));
+                request.setAttribute("meals", meals);
+                request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
             case "all":
             default:
@@ -95,7 +91,7 @@ public class MealServlet extends HttpServlet {
 
     @Override
     public void destroy() {
-        super.destroy();
         context.close();
+        super.destroy();
     }
 }

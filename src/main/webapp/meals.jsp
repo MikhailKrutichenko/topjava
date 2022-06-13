@@ -51,13 +51,19 @@
         </c:forEach>
     </table>
 
-    <form method="post" action="meals">
+    <form method="get" action="meals">
         <dl>
             <dt>Date:</dt>
-            <dd><input type="date" name="startDate"> - <input type="date" name="endDate"></dd>
+            <dd><input type="date" name="startDate"
+                       value="${param.startDate == null ? "" : param.startDate}"> - <input type="date" name="endDate"
+                                                                                           value="${param.endDate == null ? "" : param.endDate}">
+            </dd>
             <dt>Time:</dt>
-            <dd><input type="time" name="startTime"> - <input type="time" name="endTime"></dd>
-            <dd><input type="hidden" name="filter" value="true"></dd>
+            <dd><input type="time" name="startTime"
+                       value="${param.startTime == null ? "" : param.startTime}"> - <input type="time" name="endTime"
+                                                                                           value="${param.endTime == null ? "" : param.endTime}">
+            </dd>
+            <dd><input type="hidden" name="action" value="filter"></dd>
 
             <button type="submit">Filter</button>
         </dl>

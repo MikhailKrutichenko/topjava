@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealTo;
@@ -23,17 +24,22 @@ public class MealRestController {
     @Autowired
     private MealService service;
 
-    public List<MealTo> getAll(String startDate, String endDate, String startTime, String endTime) {
-        log.info("getAll");
-        LocalDate startLocalDate = startDate == null || startDate.isEmpty() ? LocalDate.MIN : LocalDate.parse(startDate);
-        LocalDate endLocalDate = endDate == null || endDate.isEmpty() ? LocalDate.MAX : LocalDate.parse(endDate);
-        LocalTime startLocalTime = startTime == null || startTime.isEmpty() ? LocalTime.MIN : LocalTime.parse(startTime);
-        LocalTime endLocalTime = endTime == null || endTime.isEmpty() ? LocalTime.MAX : LocalTime.parse(endTime);
-        return MealsUtil.getFilteredTos(service.getAll(SecurityUtil.authUserId(), startLocalDate, endLocalDate), SecurityUtil.authUserCaloriesPerDay(),
-                startLocalTime, endLocalTime);
+    public List<MealTo> getAllByFilter(String startDate, String endDate, String startTime, String endTime) {
+        log.info("getAll by filter");
+        log.debug(startDate);
+        log.debug(endDate);
+        log.debug(startTime);
+        log.debug(endTime);
+        LocalDate startLocalDate = StringUtils.hasLength(startDate) ? LocalDate.parse(startDate) : LocalDate.MIN;
+        LocalDate endLocalDate = StringUtils.hasLength(endDate) ? LocalDate.parse(endDate) : LocalDate.MAX;
+        LocalTime startLocalTime = StringUtils.hasLength(startTime) ? LocalTime.parse(startTime) : LocalTime.MIN;
+        LocalTime endLocalTime = StringUtils.hasLength(endTime) ? LocalTime.parse(endTime) : LocalTime.MAX;
+        return MealsUtil.getFilteredTos(service.getAllByFilter(SecurityUtil.authUserId(), startLocalDate, endLocalDate),
+                SecurityUtil.authUserCaloriesPerDay(), startLocalTime, endLocalTime);
     }
 
     public List<MealTo> getAll() {
+        log.info("getAll");
         return MealsUtil.getTos(service.getAll(SecurityUtil.authUserId()), SecurityUtil.authUserCaloriesPerDay());
     }
 
@@ -45,8 +51,7 @@ public class MealRestController {
     public Meal create(Meal meal) {
         log.info("create {}", meal);
         checkNew(meal);
-        meal.setUserId(SecurityUtil.authUserId());
-        return service.create(meal);
+        return service.create(meal, SecurityUtil.authUserId());
     }
 
     public void delete(int id) {
@@ -57,7 +62,6 @@ public class MealRestController {
     public void update(Meal meal, int id) {
         log.info("update {} with id={}", meal, id);
         assureIdConsistent(meal, id);
-        meal.setUserId(SecurityUtil.authUserId());
-        service.update(meal);
+        service.update(meal, SecurityUtil.authUserId());
     }
 }

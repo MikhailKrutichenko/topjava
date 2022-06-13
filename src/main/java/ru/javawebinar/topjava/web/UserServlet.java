@@ -22,7 +22,9 @@ public class UserServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         int id = Integer.parseInt(req.getParameter("id"));
+        log.info("User {} sing in", id);
         SecurityUtil.setId(id);
+        log.debug("send redirect to meals");
         resp.sendRedirect("meals");
     }
 }
