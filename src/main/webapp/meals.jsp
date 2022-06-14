@@ -54,14 +54,12 @@
     <form method="get" action="meals">
         <dl>
             <dt>Date:</dt>
-            <dd><input type="date" name="startDate"
-                       value="${param.startDate == null ? "" : param.startDate}"> - <input type="date" name="endDate"
-                                                                                           value="${param.endDate == null ? "" : param.endDate}">
+            <dd><input type="date" name="startDate" value="${param.startDate}"> - <input type="date" name="endDate"
+                                                                                         value="${param.endDate}">
             </dd>
             <dt>Time:</dt>
-            <dd><input type="time" name="startTime"
-                       value="${param.startTime == null ? "" : param.startTime}"> - <input type="time" name="endTime"
-                                                                                           value="${param.endTime == null ? "" : param.endTime}">
+            <dd><input type="time" name="startTime" value="${param.startTime}"> - <input type="time" name="endTime"
+                                                                                         value="${param.endTime}">
             </dd>
             <dd><input type="hidden" name="action" value="filter"></dd>
 

@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealTo;
@@ -21,21 +20,14 @@ import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
 @Controller
 public class MealRestController {
     private final Logger log = LoggerFactory.getLogger(MealRestController.class);
+    
     @Autowired
     private MealService service;
 
-    public List<MealTo> getAllByFilter(String startDate, String endDate, String startTime, String endTime) {
-        log.info("getAll by filter");
-        log.debug(startDate);
-        log.debug(endDate);
-        log.debug(startTime);
-        log.debug(endTime);
-        LocalDate startLocalDate = StringUtils.hasLength(startDate) ? LocalDate.parse(startDate) : LocalDate.MIN;
-        LocalDate endLocalDate = StringUtils.hasLength(endDate) ? LocalDate.parse(endDate) : LocalDate.MAX;
-        LocalTime startLocalTime = StringUtils.hasLength(startTime) ? LocalTime.parse(startTime) : LocalTime.MIN;
-        LocalTime endLocalTime = StringUtils.hasLength(endTime) ? LocalTime.parse(endTime) : LocalTime.MAX;
-        return MealsUtil.getFilteredTos(service.getAllByFilter(SecurityUtil.authUserId(), startLocalDate, endLocalDate),
-                SecurityUtil.authUserCaloriesPerDay(), startLocalTime, endLocalTime);
+    public List<MealTo> getAllByFilter(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
+        log.info("getAll by filter startDate {}, endDate {}, startTime {}, endTime {}", startDate, endDate, startTime, endTime);
+        return MealsUtil.getFilteredTos(service.getAllByFilter(SecurityUtil.authUserId(), startDate, endDate),
+                SecurityUtil.authUserCaloriesPerDay(), startTime, endTime);
     }
 
     public List<MealTo> getAll() {

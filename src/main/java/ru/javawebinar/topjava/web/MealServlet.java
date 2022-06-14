@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.util.StringUtils;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.web.meal.MealRestController;
@@ -13,7 +14,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
@@ -27,7 +30,7 @@ public class MealServlet extends HttpServlet {
     public void init() {
         context = new ClassPathXmlApplicationContext("spring/spring-app.xml");
         controller = context.getBean(MealRestController.class);
-        log.info("create context:", context);
+        log.info("create context: {}", context);
     }
 
     @Override
@@ -37,8 +40,7 @@ public class MealServlet extends HttpServlet {
         Meal meal = new Meal(id.isEmpty() ? null : Integer.parseInt(id),
                 LocalDateTime.parse(request.getParameter("dateTime")),
                 request.getParameter("description"),
-                Integer.parseInt(request.getParameter("calories")),
-                null);
+                Integer.parseInt(request.getParameter("calories")));
         if (meal.isNew()) {
             log.info("Create {}", meal);
             controller.create(meal);
@@ -62,16 +64,20 @@ public class MealServlet extends HttpServlet {
             case "create":
             case "update":
                 final Meal meal = "create".equals(action) ?
-                        new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000, null) :
+                        new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000) :
                         controller.get(getId(request));
                 request.setAttribute("meal", meal);
                 request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
                 break;
             case "filter":
-                List<MealTo> meals = controller.getAllByFilter(request.getParameter("startDate"),
-                        request.getParameter("endDate"),
-                        request.getParameter("startTime"),
-                        request.getParameter("endTime"));
+                String startDate = request.getParameter("startDate");
+                String endDate = request.getParameter("endDate");
+                String startTime = request.getParameter("startTime");
+                String endTime = request.getParameter("endTime");
+                List<MealTo> meals = controller.getAllByFilter(StringUtils.hasLength(startDate) ? LocalDate.parse(startDate) : LocalDate.MIN,
+                        StringUtils.hasLength(endDate) ? LocalDate.parse(endDate) : LocalDate.MAX,
+                        StringUtils.hasLength(startTime) ? LocalTime.parse(startTime) : LocalTime.MIN,
+                        StringUtils.hasLength(endTime) ? LocalTime.parse(endTime) : LocalTime.MAX);
                 request.setAttribute("meals", meals);
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
