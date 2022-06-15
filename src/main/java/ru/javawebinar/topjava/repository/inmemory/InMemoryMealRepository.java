@@ -36,12 +36,11 @@ public class InMemoryMealRepository implements MealRepository {
     public Meal save(Meal meal, int userId) {
         if (meal.isNew()) {
             meal.setId(counter.incrementAndGet());
-            repository.putIfAbsent(userId, new ConcurrentHashMap<>());
+            repository.computeIfAbsent(userId, id -> new ConcurrentHashMap<>());
             repository.get(userId).put(meal.getId(), meal);
             return meal;
         }
-        Meal updateMeal = get(meal.getId(), userId);
-        if (updateMeal == null) {
+        if (repository.get(userId) == null) {
             return null;
         }
         return repository.get(userId).computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
@@ -56,30 +55,26 @@ public class InMemoryMealRepository implements MealRepository {
     @Override
     public Meal get(int id, int userId) {
         Map<Integer, Meal> meals = repository.get(userId);
-        if (meals == null) {
-            return null;
-        }
-        return meals.get(id);
+        return meals == null ? null : meals.get(id);
     }
 
     @Override
     public List<Meal> getAllByFilter(int userId, LocalDate startDate, LocalDate endDate) {
-        return filterByPredicate(repository.get(userId), m -> DateTimeUtil.isBetweenInclusive(m.getDate(), startDate, endDate));
+        return filterByPredicate(m -> DateTimeUtil.isBetweenInclusive(m.getDate(), startDate, endDate), userId);
     }
 
     @Override
     public List<Meal> getAll(int userId) {
-        return filterByPredicate(repository.get(userId), m -> true);
+        return filterByPredicate(m -> true, userId);
     }
 
-    private List<Meal> filterByPredicate(Map<Integer, Meal> meals, Predicate<Meal> filter) {
-        if (meals != null) {
-            return meals.values().stream()
-                    .filter(filter)
-                    .sorted(Comparator.comparing(Meal::getDateTime).reversed())
-                    .collect(Collectors.toList());
-        }
-        return Collections.emptyList();
+    private List<Meal> filterByPredicate(Predicate<Meal> filter, int userId) {
+        Map<Integer, Meal> meals = repository.get(userId);
+        return meals == null ? Collections.emptyList() :
+                meals.values().stream()
+                        .filter(filter)
+                        .sorted(Comparator.comparing(Meal::getDateTime).reversed())
+                        .collect(Collectors.toList());
     }
 }
 
