@@ -41,7 +41,6 @@ abstract class AbstractJdbcMealRepository implements MealRepository {
                 .addValue("calories", meal.getCalories())
                 .addValue("date_time", getDateTime(meal.getDateTime()))
                 .addValue("user_id", userId);
-
         if (meal.isNew()) {
             Number newId = insertMeal.executeAndReturnKey(map);
             meal.setId(newId.intValue());
@@ -81,5 +80,5 @@ abstract class AbstractJdbcMealRepository implements MealRepository {
                 ROW_MAPPER, userId, getDateTime(startDateTime), getDateTime(endDateTime));
     }
 
-    abstract Object getDateTime(LocalDateTime dateTime);
+    abstract <T extends Object> T getDateTime(LocalDateTime dateTime);
 }

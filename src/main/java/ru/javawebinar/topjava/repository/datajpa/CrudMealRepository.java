@@ -12,8 +12,8 @@ import java.util.List;
 
 @Transactional(readOnly = true)
 public interface CrudMealRepository extends JpaRepository<Meal, Integer> {
+
     @Transactional
-    @Modifying
     Meal save(Meal meal);
 
     @Transactional
@@ -29,6 +29,6 @@ public interface CrudMealRepository extends JpaRepository<Meal, Integer> {
                                   @Param("endDateTime") LocalDateTime endDateTime,
                                   @Param("userId") int userId);
 
-    @Query("SELECT m FROM Meal m JOIN User u ON m.user.id = :userId WHERE m.id = :id")
+    @Query("SELECT m FROM Meal m JOIN FETCH m.user WHERE m.user.id = :userId AND m.id = :id")
     Meal getWithUser(@Param("id") int id, @Param("userId") int userId);
 }

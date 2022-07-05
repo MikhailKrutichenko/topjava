@@ -1,4 +1,4 @@
-package ru.javawebinar.topjava.service.user;
+package ru.javawebinar.topjava.service.datajpa;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -7,6 +7,7 @@ import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.User;
+import ru.javawebinar.topjava.service.AbstractUserServiceTest;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.util.Arrays;
@@ -40,6 +41,7 @@ public class DataJpaUserServiceTest extends AbstractUserServiceTest {
         expectedUser.setMeals(Collections.emptyList());
         User actualUser = service.getWithMeals(guest.id());
         USER_MATCHER.assertMatch(actualUser, expectedUser);
+        //  Assert.assertTrue(actualUser.getMeals().isEmpty());
         MEAL_MATCHER.assertMatch(actualUser.getMeals(), expectedUser.getMeals());
     }
 }
