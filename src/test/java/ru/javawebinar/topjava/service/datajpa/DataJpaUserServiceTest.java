@@ -11,7 +11,6 @@ import ru.javawebinar.topjava.service.AbstractUserServiceTest;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -38,10 +37,8 @@ public class DataJpaUserServiceTest extends AbstractUserServiceTest {
     @Test
     public void getWithoutMeals() {
         User expectedUser = guest;
-        expectedUser.setMeals(Collections.emptyList());
         User actualUser = service.getWithMeals(guest.id());
         USER_MATCHER.assertMatch(actualUser, expectedUser);
-        //  Assert.assertTrue(actualUser.getMeals().isEmpty());
-        MEAL_MATCHER.assertMatch(actualUser.getMeals(), expectedUser.getMeals());
+        Assert.assertTrue(actualUser.getMeals().isEmpty());
     }
 }
