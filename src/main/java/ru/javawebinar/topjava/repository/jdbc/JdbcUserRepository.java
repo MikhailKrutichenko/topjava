@@ -1,31 +1,43 @@
 package ru.javawebinar.topjava.repository.jdbc;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 @Repository
 @Transactional(readOnly = true)
 public class JdbcUserRepository implements UserRepository {
+
+    private static final Logger log = getLogger(JdbcUserRepository.class);
 
     private final JdbcTemplate jdbcTemplate;
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final SimpleJdbcInsert insertUser;
+
+    private final Validator validator;
 
     @Autowired
     public JdbcUserRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
@@ -35,6 +47,7 @@ public class JdbcUserRepository implements UserRepository {
 
         this.jdbcTemplate = jdbcTemplate;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+        this.validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
     @Override
@@ -55,7 +68,7 @@ public class JdbcUserRepository implements UserRepository {
             jdbcTemplate.update("DELETE FROM user_roles WHERE user_id=?", user.id());
             saveRoles(user);
         }
-        return user;
+        return isValid(Collections.singletonList(user)) ? user : null;
     }
 
     @Override
@@ -66,49 +79,24 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public User get(int id) {
-        SqlRowSet rs = jdbcTemplate.queryForRowSet("SELECT users.*, user_roles.role FROM users \n" +
-                " LEFT JOIN user_roles ON users.id = user_roles.user_id WHERE users.id =?", id);
-
-        return mappingUsersWithRoles(rs).stream().findFirst().orElse(null);
+        List<User> users = jdbcTemplate.query("SELECT users.*, user_roles.role FROM users \n" +
+                " LEFT JOIN user_roles ON users.id = user_roles.user_id WHERE users.id =?", new UserResultSetExecutor(), id);
+        return isValid(users) ? users.stream().findFirst().orElse(null) : null;
     }
 
     @Override
     public User getByEmail(String email) {
-        SqlRowSet rs = jdbcTemplate.queryForRowSet("SELECT users.*, user_roles.role FROM users \n" +
-                "LEFT JOIN user_roles ON users.id = user_roles.user_id WHERE users.email=?", email);
-        return mappingUsersWithRoles(rs).stream().findFirst().get();
+        List<User> users = jdbcTemplate.query("SELECT users.*, user_roles.role FROM users \n" +
+                "LEFT JOIN user_roles ON users.id = user_roles.user_id WHERE users.email=?", new UserResultSetExecutor(), email);
+        return isValid(users) ? users.stream().findFirst().orElse(null) : null;
     }
 
     @Override
     public List<User> getAll() {
-        SqlRowSet rs = jdbcTemplate.queryForRowSet("SELECT users.*, user_roles.role FROM users \n" +
-                "LEFT JOIN user_roles ON users.id = user_roles.user_id ORDER BY users.name, users.email");
-        return mappingUsersWithRoles(rs);
-    }
-
-    private List<User> mappingUsersWithRoles(SqlRowSet rs) {
-        Map<Integer, User> usersMap = new LinkedHashMap<>();
-        while (rs.next()) {
-            int id = rs.getInt("id");
-            if (usersMap.containsKey(id)) {
-                usersMap.get(id).getRoles().add(Role.valueOf(rs.getString("role")));
-            } else {
-                String name = rs.getString("name");
-                String email = rs.getString("email");
-                String password = rs.getString("password");
-                Date registered = rs.getDate("registered");
-                boolean enabled = rs.getBoolean("enabled");
-                int caloriesPerDay = rs.getInt("calories_per_day");
-                Set<Role> roles = new HashSet<>();
-                String role = rs.getString("role");
-                if (Objects.nonNull(role)) {
-                    roles.add(Role.valueOf(rs.getString("role")));
-                }
-                User user = new User(id, name, email, password, caloriesPerDay, enabled, registered, roles);
-                usersMap.put(id, user);
-            }
-        }
-        return new ArrayList<>(usersMap.values());
+        String query = "SELECT users.*, user_roles.role FROM users \n" +
+                "LEFT JOIN user_roles ON users.id = user_roles.user_id ORDER BY users.name, users.email";
+        List<User> users = jdbcTemplate.query(query, new UserResultSetExecutor());
+        return isValid(users) ? users : Collections.emptyList();
     }
 
     private void saveRoles(User user) {
@@ -126,5 +114,47 @@ public class JdbcUserRepository implements UserRepository {
                 return roles.size();
             }
         });
+    }
+
+    private class UserResultSetExecutor implements ResultSetExtractor<List<User>> {
+
+        @Override
+        public List<User> extractData(ResultSet rs) throws SQLException, DataAccessException {
+            List<User> users = new ArrayList<>();
+            int usersSize = 0;
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                if (usersSize != 0 && users.get(usersSize - 1).id() == id) {
+                    users.get(usersSize - 1).getRoles().add(Role.valueOf(rs.getString("role")));
+                } else {
+                    String name = rs.getString("name");
+                    String email = rs.getString("email");
+                    String password = rs.getString("password");
+                    Date registered = rs.getDate("registered");
+                    boolean enabled = rs.getBoolean("enabled");
+                    int caloriesPerDay = rs.getInt("calories_per_day");
+                    Set<Role> roles = new HashSet<>();
+                    String role = rs.getString("role");
+                    if (role != null) {
+                        roles.add(Role.valueOf(role));
+                    }
+                    User user = new User(id, name, email, password, caloriesPerDay, enabled, registered, roles);
+                    users.add(user);
+                    usersSize++;
+                }
+            }
+            return users;
+        }
+    }
+
+    private boolean isValid(List<User> users) {
+        for (User user : users) {
+            Set<ConstraintViolation<User>> violations = validator.validate(user);
+            if (!violations.isEmpty()) {
+                violations.forEach(v -> log.info(v.getMessage()));
+                return false;
+            }
+        }
+        return true;
     }
 }
