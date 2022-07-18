@@ -35,7 +35,7 @@ public class JspMealController {
         this.service = service;
     }
 
-    @GetMapping("")
+    @GetMapping
     public String getAll(Model model) {
         log.info("get meals");
         model.addAttribute("meals",
@@ -65,20 +65,23 @@ public class JspMealController {
         return "redirect:/meals";
     }
 
-    @GetMapping("/save")
-    public String get(HttpServletRequest request, Model model) {
-        Meal mael;
-        String id = request.getParameter("id");
-        if (id == null || id.isEmpty()) {
-            mael = new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000);
-        } else {
-            mael = service.get(Integer.parseInt(id), SecurityUtil.authUserId());
-        }
+    @GetMapping("/create")
+    public String create(Model model) {
+        Meal mael = new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000);
         model.addAttribute("meal", mael);
         return "mealForm";
     }
 
-    @PostMapping("/createUpdate")
+    @GetMapping("/update")
+    public String update(HttpServletRequest request, Model model) {
+        Meal mael;
+        String id = request.getParameter("id");
+        mael = service.get(Integer.parseInt(id), SecurityUtil.authUserId());
+        model.addAttribute("meal", mael);
+        return "mealForm";
+    }
+
+    @PostMapping
     public String save(HttpServletRequest request) {
         Meal meal = new Meal(
                 LocalDateTime.parse(request.getParameter("dateTime")),
