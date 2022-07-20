@@ -5,13 +5,10 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <html>
 <jsp:include page="fragments/headTag.jsp"/>
-<body>
 <jsp:include page="fragments/bodyHeader.jsp"/>
 <br>
-<head>
-    <title><spring:message code="meal.title"/></title>
-    <link href="<c:url value="/resources/css/style.css"/>" rel="stylesheet">
-</head>
+<title><spring:message code="meal.title"/></title>
+<link href="<c:url value="/resources/css/style.css"/>" rel="stylesheet">
 <body>
 <section>
     <hr/>

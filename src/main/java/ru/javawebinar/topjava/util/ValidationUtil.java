@@ -1,14 +1,35 @@
 package ru.javawebinar.topjava.util;
 
 
+import org.slf4j.Logger;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.lang.NonNull;
 import ru.javawebinar.topjava.model.AbstractBaseEntity;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import java.util.Set;
+
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class ValidationUtil {
 
+    private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
+    private static final Logger log = getLogger(ValidationUtil.class);
+
     private ValidationUtil() {
+    }
+
+    public static void validate(AbstractBaseEntity entity) {
+        Set<ConstraintViolation<AbstractBaseEntity>> violations = validator.validate(entity);
+        if (!violations.isEmpty()) {
+            violations.forEach(v -> log.info(v.getMessage()));
+            throw new ConstraintViolationException(violations);
+        }
     }
 
     public static <T> T checkNotFoundWithId(T object, int id) {
