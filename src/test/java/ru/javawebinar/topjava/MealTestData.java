@@ -1,9 +1,12 @@
 package ru.javawebinar.topjava;
 
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.to.MealTo;
 
 import java.time.Month;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static java.time.LocalDateTime.of;
@@ -11,6 +14,7 @@ import static ru.javawebinar.topjava.model.AbstractBaseEntity.START_SEQ;
 
 public class MealTestData {
     public static final MatcherFactory.Matcher<Meal> MEAL_MATCHER = MatcherFactory.usingIgnoringFieldsComparator(Meal.class, "user");
+    public static final MatcherFactory.Matcher<MealTo> MEAL_TO_MATCHER = MatcherFactory.usingIgnoringFieldsComparator(MealTo.class);
 
     public static final int NOT_FOUND = 10;
     public static final int MEAL1_ID = START_SEQ + 3;
@@ -34,5 +38,15 @@ public class MealTestData {
 
     public static Meal getUpdated() {
         return new Meal(MEAL1_ID, meal1.getDateTime().plus(2, ChronoUnit.MINUTES), "Обновленный завтрак", 200);
+    }
+
+    public static List<MealTo> getMealTo() {
+        return Arrays.asList(new MealTo(MEAL1_ID + 6, of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 510, true),
+                new MealTo(MEAL1_ID + 5, of(2020, Month.JANUARY, 31, 13, 0), "Обед", 1000, true),
+                new MealTo(MEAL1_ID + 4, of(2020, Month.JANUARY, 31, 10, 0), "Завтрак", 500, true),
+                new MealTo(MEAL1_ID + 3, of(2020, Month.JANUARY, 31, 0, 0), "Еда на граничное значение", 100, true),
+                new MealTo(MEAL1_ID + 2, of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500, false),
+                new MealTo(MEAL1_ID + 1, of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000, false),
+                new MealTo(MEAL1_ID, of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500, false));
     }
 }

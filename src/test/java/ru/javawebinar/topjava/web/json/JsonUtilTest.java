@@ -1,4 +1,4 @@
-﻿package ru.javawebinar.topjava.web.json;
+package ru.javawebinar.topjava.web.json;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;

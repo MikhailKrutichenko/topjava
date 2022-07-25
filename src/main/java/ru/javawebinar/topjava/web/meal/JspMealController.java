@@ -1,4 +1,4 @@
-﻿package ru.javawebinar.topjava.web.meal;
+package ru.javawebinar.topjava.web.meal;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
