@@ -1,7 +1,9 @@
 package ru.javawebinar.topjava.web.meal;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealTo;
@@ -30,13 +32,14 @@ public class MealRestController extends AbstractMealController {
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void update(@RequestBody Meal meal) {
         super.update(meal, meal.id());
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Meal create(@RequestBody Meal meal) {
-        return super.create(meal);
+    public ResponseEntity<Meal> save(@RequestBody Meal meal) {
+        return new ResponseEntity<>(super.create(meal), HttpStatus.CREATED);
     }
 
     @GetMapping(value = "/filter")
