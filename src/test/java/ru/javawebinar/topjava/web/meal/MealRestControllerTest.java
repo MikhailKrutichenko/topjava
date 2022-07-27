@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.LinkedMultiValueMap;
 import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
@@ -42,7 +43,7 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MEAL_TO_MATCHER.contentJson(getMealTo()));
+                .andExpect(MEAL_TO_MATCHER.contentJson(getMealTos()));
     }
 
     @Test
@@ -79,8 +80,12 @@ class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void filter() throws Exception {
-        perform(MockMvcRequestBuilders.get(URL + "/filter?startDate=2020-01-30T00:00&startTime=2020-01-30T11:00" +
-                "&endDate=2020-01-30T23:00&endTime=2020-01-31T21:00"))
+        LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("startDate", "2020-01-30T00:00");
+        params.add("startTime", "2020-01-30T11:00");
+        params.add("endDate", "2020-01-30T23:00");
+        params.add("endTime", "2020-01-31T21:00");
+        perform(MockMvcRequestBuilders.get(URL + "/filter").params(params))
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
