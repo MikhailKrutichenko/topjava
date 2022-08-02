@@ -1,4 +1,4 @@
-﻿package ru.javawebinar.topjava.web;
+package ru.javawebinar.topjava.web;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;

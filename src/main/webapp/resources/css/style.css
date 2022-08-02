@@ -23,6 +23,10 @@ tr[data-meal-excess="true"] {
     color: red;
 }
 
+tr[date-user-disable="false"] {
+    color: rgba(255,255,255,0.8);
+}
+
 .fa {
     cursor: pointer;
 }

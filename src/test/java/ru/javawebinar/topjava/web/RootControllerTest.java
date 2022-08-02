@@ -1,4 +1,4 @@
-﻿package ru.javawebinar.topjava.web;
+package ru.javawebinar.topjava.web;
 
 import org.assertj.core.matcher.AssertionMatcher;
 import org.junit.jupiter.api.Test;

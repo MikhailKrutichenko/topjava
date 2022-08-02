@@ -1,4 +1,4 @@
-﻿package ru.javawebinar.topjava.web;
+package ru.javawebinar.topjava.web;
 
 import org.junit.jupiter.api.Assumptions;
 import org.springframework.beans.factory.annotation.Autowired;
