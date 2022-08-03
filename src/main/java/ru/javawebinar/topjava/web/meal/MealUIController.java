@@ -16,6 +16,7 @@ import java.util.List;
 @RequestMapping(value = "meals", produces = MediaType.APPLICATION_JSON_VALUE)
 public class MealUIController extends AbstractMealController {
 
+    @Override
     @GetMapping
     public List<MealTo> getAll() {
         return super.getAll();
@@ -29,12 +30,14 @@ public class MealUIController extends AbstractMealController {
         super.create(new Meal(null, localDateTime, description, calories));
     }
 
+    @Override
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Integer id) {
+    public void delete(@PathVariable int id) {
         super.delete(id);
     }
 
+    @Override
     @GetMapping("/between")
     public List<MealTo> getBetween(@RequestParam @Nullable LocalDate startDate,
                                    @RequestParam @Nullable LocalTime startTime,

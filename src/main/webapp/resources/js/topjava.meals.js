@@ -1,8 +1,8 @@
-const userAjaxUrl = "meals/";
+const mealAjaxUrl = "meals/";
 
 // https://stackoverflow.com/a/5064235/548473
 const ctx = {
-    ajaxUrl: userAjaxUrl
+    ajaxUrl: mealAjaxUrl
 };
 
 function filtered() {

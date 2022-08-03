@@ -5,6 +5,14 @@ const ctx = {
     ajaxUrl: userAjaxUrl
 };
 
+function enable(id, enable) {
+    $.ajax({
+        url: ctx.ajaxUrl + id,
+        type: "POST",
+        data: "enable=" + enable
+    })
+}
+
 // $(document).ready(function () {
 $(function () {
     makeEditable(
