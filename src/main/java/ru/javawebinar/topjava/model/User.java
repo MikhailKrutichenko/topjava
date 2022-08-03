@@ -25,7 +25,7 @@ import static ru.javawebinar.topjava.util.MealsUtil.DEFAULT_CALORIES_PER_DAY;
         @NamedQuery(name = User.DELETE, query = "DELETE FROM User u WHERE u.id=:id"),
         @NamedQuery(name = User.BY_EMAIL, query = "SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.roles WHERE u.email=?1"),
         @NamedQuery(name = User.ALL_SORTED, query = "SELECT u FROM User u ORDER BY u.name, u.email"),
-        @NamedQuery(name = User.ENABLED, query = "UPDATE User u SET u.óenabled =?1 WHERE u.id=?2")
+        @NamedQuery(name = User.ENABLED, query = "UPDATE User u SET u.enabled =?1 WHERE u.id=?2")
 })
 @Entity
 @Table(name = "users")
