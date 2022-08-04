@@ -1,4 +1,4 @@
-﻿package ru.javawebinar.topjava;
+package ru.javawebinar.topjava;
 
 import org.junit.jupiter.api.extension.*;
 import org.slf4j.Logger;
