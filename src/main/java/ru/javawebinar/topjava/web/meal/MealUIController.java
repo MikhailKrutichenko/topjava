@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealTo;
 
 import javax.validation.Valid;
@@ -23,6 +24,12 @@ public class MealUIController extends AbstractMealController {
     private static final Logger log = getLogger(MealUIController.class);
 
     @Override
+    @GetMapping("/{id}")
+    public Meal get(@PathVariable int id) {
+        return super.get(id);
+    }
+
+    @Override
     @GetMapping
     public List<MealTo> getAll() {
         return super.getAll();
@@ -35,7 +42,7 @@ public class MealUIController extends AbstractMealController {
         super.delete(id);
     }
 
-    @PostMapping()
+    @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<String> createOrUpdate(@Valid MealTo mealTo, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
