@@ -17,6 +17,26 @@ function clearFilter() {
     $.get(mealAjaxUrl, updateTableByData);
 }
 
+$('#dateTime').datetimepicker({
+    format:'yy-m-d H:m'
+});
+$('#startDate').datetimepicker({
+    timepicker: false,
+    format:'yy-m-d'
+});
+$('#startTime').datetimepicker({
+    datepicker: false,
+    format:'H:m'
+});
+$('#endDate').datetimepicker({
+    timepicker: false,
+    format:'yy-m-d'
+});
+$('#endTime').datetimepicker({
+    datepicker: false,
+    format:'H:m'
+});
+
 $(function () {
     makeEditable(
         $("#datatable").DataTable({
