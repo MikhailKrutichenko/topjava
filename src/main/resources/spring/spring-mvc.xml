@@ -61,8 +61,6 @@
         </bean>
     -->
 
-
-
     <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource"
           p:cacheSeconds="5"
           p:defaultEncoding="UTF-8">

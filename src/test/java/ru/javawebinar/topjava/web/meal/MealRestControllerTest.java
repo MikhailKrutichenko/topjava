@@ -104,9 +104,8 @@ class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void unAuth() throws Exception {
-        perform(MockMvcRequestBuilders.get("/meals"))
+        perform(MockMvcRequestBuilders.get("/rest/profile/meals"))
                 .andDo(print())
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("http://localhost/login"));
+                .andExpect(status().is4xxClientError());
     }
 }

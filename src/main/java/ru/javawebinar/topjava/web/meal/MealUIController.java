@@ -65,7 +65,7 @@ public class MealUIController extends AbstractMealController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("'from date' must be less than 'to date'");
         }
         if ((startTime != null && endTime != null) && startTime.isAfter(endTime)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("'from time' must be less 'than to time'");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("'from time' must be less than 'to time'");
         }
         return new ResponseEntity<>(super.getBetween(startDate, startTime, endDate, endTime), HttpStatus.OK);
     }

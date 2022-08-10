@@ -30,6 +30,14 @@ class RootControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void unAuthMeals() throws Exception {
+        perform(get("/meals"))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("http://localhost/login"));
+    }
+
+    @Test
     void getMeals() throws Exception {
         perform(get("/meals")
                 .with(userAuth(user)))
