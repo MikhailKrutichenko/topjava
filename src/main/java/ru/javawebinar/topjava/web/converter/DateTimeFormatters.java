@@ -42,9 +42,6 @@ public class DateTimeFormatters {
 
         @Override
         public LocalDateTime parse(String text, Locale locale) {
-            if (text.length() > 16) {
-                text = text.substring(0, 16).replace("T", " ");
-            }
             return LocalDateTime.parse(text, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         }
 

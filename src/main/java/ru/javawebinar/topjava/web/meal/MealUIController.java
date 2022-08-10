@@ -9,12 +9,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealTo;
+import ru.javawebinar.topjava.util.ValidationUtil;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -43,30 +43,30 @@ public class MealUIController extends AbstractMealController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<String> createOrUpdate(@Valid MealTo mealTo, BindingResult bindingResult) {
+    public ResponseEntity<String> createOrUpdate(@Valid Meal meal, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            String errorFieldsMsg = bindingResult.getFieldErrors().stream()
-                    .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
-                    .collect(Collectors.joining("<br>"));
-            log.debug(errorFieldsMsg);
-            return ResponseEntity.unprocessableEntity().body(errorFieldsMsg);
+            return ValidationUtil.responseForError(bindingResult);
         }
-        if (mealTo.isNew()) {
-            create(mealTo);
+        if (meal.isNew()) {
+            create(meal);
         } else {
-            update(mealTo, mealTo.id());
+            update(meal, meal.id());
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @Override
     @GetMapping("/filter")
-    public List<MealTo> getBetween(
+    public ResponseEntity getBetweenWithConstrain(
             @RequestParam @Nullable LocalDate startDate,
             @RequestParam @Nullable LocalTime startTime,
             @RequestParam @Nullable LocalDate endDate,
             @RequestParam @Nullable LocalTime endTime) {
-        return super.getBetween(startDate, startTime, endDate, endTime);
+        if ((startDate != null && endDate != null) && startDate.isAfter(endDate)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("'from date' must be less than 'to date'");
+        }
+        if ((startTime != null && endTime != null) && startTime.isAfter(endTime)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("'from time' must be less 'than to time'");
+        }
+        return new ResponseEntity<>(super.getBetween(startDate, startTime, endDate, endTime), HttpStatus.OK);
     }
 }

@@ -78,10 +78,7 @@
 </div>
 <jsp:include page="fragments/footer.jsp"/>
 </body>
-<script type="text/javascript">
-    const i18n = [];
-    i18n["addTitle"] = '<spring:message code="user.add"/>';
-    i18n["editTitle"] = '<spring:message code="user.edit"/>';
-</script>
-<jsp:include page="commonLocalization.jsp"></jsp:include>
+<jsp:include page="commonLocalization.jsp">
+    <jsp:param name="name" value="user"/>
+</jsp:include>
 </html>

@@ -18,23 +18,27 @@ function clearFilter() {
 }
 
 $('#dateTime').datetimepicker({
-    format:'yy-m-d H:m'
-});
+    format: 'Y-m-d H:i'
+})
+
 $('#startDate').datetimepicker({
     timepicker: false,
-    format:'yy-m-d'
+    format: 'Y-m-d'
 });
+
 $('#startTime').datetimepicker({
     datepicker: false,
-    format:'H:m'
+    format: 'H:i'
 });
+
 $('#endDate').datetimepicker({
     timepicker: false,
-    format:'yy-m-d'
+    format: 'Y-m-d'
 });
+
 $('#endTime').datetimepicker({
     datepicker: false,
-    format:'H:m'
+    format: 'H:i'
 });
 
 $(function () {
@@ -50,8 +54,8 @@ $(function () {
                 {
                     "data": "dateTime",
                     "render": function (date, type, row) {
-                        if(type === "display") {
-                            return date.replace('T', ' ').slice(0, -3);
+                        if (type === "display") {
+                            return formatDate(date);
                         }
                         return date;
                     }
