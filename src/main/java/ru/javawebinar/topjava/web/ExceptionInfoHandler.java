@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.web;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -37,6 +38,10 @@ public class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ErrorInfo conflict(HttpServletRequest req, DataIntegrityViolationException e) {
+        Throwable rootCause = ValidationUtil.getRootCause(e);
+        if (rootCause.toString().toLowerCase().contains("users_unique_email_idx")) {
+            return duplicateEmailErrorInfo(req);
+        }
         return logAndGetErrorInfo(req, e, true, DATA_ERROR);
     }
 
@@ -61,5 +66,9 @@ public class ExceptionInfoHandler {
             log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause.toString());
         }
         return new ErrorInfo(req.getRequestURL(), errorType, rootCause.getMessage());
+    }
+
+    private static ErrorInfo duplicateEmailErrorInfo(HttpServletRequest req) {
+        return new ErrorInfo(req.getRequestURL(), DATA_ERROR, "User with this email already exists");
     }
 }

@@ -2,6 +2,7 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,6 +23,7 @@ public class GlobalExceptionHandler {
         Throwable rootCause = ValidationUtil.getRootCause(e);
 
         HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+
         ModelAndView mav = new ModelAndView("exception",
                 Map.of("exception", rootCause, "message", rootCause.toString(), "status", httpStatus));
         mav.setStatus(httpStatus);
@@ -32,5 +34,21 @@ public class GlobalExceptionHandler {
             mav.addObject("userTo", authorizedUser.getUserTo());
         }
         return mav;
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    private ModelAndView duplicateEmailError(HttpServletRequest req, Exception e) {
+        Throwable rootCause = ValidationUtil.getRootCause(e);
+        HttpStatus status = HttpStatus.CONFLICT;
+        if (rootCause.toString().toLowerCase().contains("users_unique_email_idx")) {
+            ModelAndView modelAndView = new ModelAndView("exception",
+                    Map.of("message", "User with this email already exists"));
+            modelAndView.setStatus(status);
+            return modelAndView;
+        }
+        ModelAndView modelAndView = new ModelAndView("exception",
+                Map.of("exception", rootCause, "message", rootCause.toString(), "status", status));
+        modelAndView.setStatus(status);
+        return modelAndView;
     }
 }
