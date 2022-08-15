@@ -62,4 +62,8 @@ public class UserTestData {
     public static User getInvalidUserUpdate() {
         return new User(100000, "", "fdsdfsdf", "1", 1, true, new Date(), Collections.singleton(Role.USER));
     }
+
+    public static User getDuplicateEmail() {
+        return new User(null, "UserDuplicateEmail", "user@yandex.ru", "pass123", 2006, Role.USER);
+    }
 }

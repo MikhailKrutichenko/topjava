@@ -42,6 +42,9 @@ public class ExceptionInfoHandler {
         if (rootCause.toString().toLowerCase().contains("users_unique_email_idx")) {
             return duplicateEmailErrorInfo(req);
         }
+        if (rootCause.toString().toLowerCase().contains("meals_unique_user_datetime_idx")) {
+            return duplicateDateTimeMeal(req);
+        }
         return logAndGetErrorInfo(req, e, true, DATA_ERROR);
     }
 
@@ -70,5 +73,9 @@ public class ExceptionInfoHandler {
 
     private static ErrorInfo duplicateEmailErrorInfo(HttpServletRequest req) {
         return new ErrorInfo(req.getRequestURL(), DATA_ERROR, "User with this email already exists");
+    }
+
+    private ErrorInfo duplicateDateTimeMeal(HttpServletRequest req) {
+        return new ErrorInfo(req.getRequestURL(), DATA_ERROR, "Meal with this date time already exists");
     }
 }

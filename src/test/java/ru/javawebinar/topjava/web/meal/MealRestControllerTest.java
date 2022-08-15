@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
@@ -142,5 +144,18 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .with(userHttpBasic(user))
                 .content(JsonUtil.writeValue(invalidMeal)))
                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    void duplicateDateTime() throws Exception {
+        Meal duplicateDateTimeMeal = getDuplicateDateTime();
+        perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(duplicateDateTimeMeal)))
+                .andExpect(status().isConflict())
+                .andExpect(content().string("{\"url\":\"http://localhost/rest/profile/meals/\",\"type\":" +
+                        "\"DATA_ERROR\",\"detail\":\"Meal with this date time already exists\"}"));
     }
 }
