@@ -3,6 +3,7 @@ package ru.javawebinar.topjava;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealTo;
 
+import java.time.LocalDate;
 import java.time.Month;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -36,5 +37,13 @@ public class MealTestData {
 
     public static Meal getUpdated() {
         return new Meal(MEAL1_ID, meal1.getDateTime().plus(2, ChronoUnit.MINUTES), "Обновленный завтрак", 200);
+    }
+
+    public static Meal getInvalidMealCreate(){
+        return new Meal(null, of(2022, Month.JANUARY, 01, 21, 0), "", 1);
+    }
+
+    public static Meal getInvalidateMealUpdate() {
+        return new Meal(100003, null, "R", 1);
     }
 }

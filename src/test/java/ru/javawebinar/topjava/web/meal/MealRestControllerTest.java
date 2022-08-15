@@ -123,4 +123,24 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(TO_MATCHER.contentJson(getTos(meals, user.getCaloriesPerDay())));
     }
+
+    @Test
+    void invalidDataCreate() throws Exception {
+        Meal invalidMeal = getInvalidMealCreate();
+        perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(invalidMeal)))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    void invalidDataUpdate() throws Exception {
+        Meal invalidMeal = getInvalidateMealUpdate();
+        perform(MockMvcRequestBuilders.put(REST_URL + "/100003")
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(invalidMeal)))
+                .andExpect(status().isUnprocessableEntity());
+    }
 }

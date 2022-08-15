@@ -49,7 +49,7 @@ public class MealRestController extends AbstractMealController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Meal> createWithLocation( @RequestBody Meal meal, BindingResult result) {
+    public ResponseEntity<Meal> createWithLocation(@Valid @RequestBody Meal meal, BindingResult result) {
         ValidationUtil.validation(result);
         Meal created = super.create(meal);
 
