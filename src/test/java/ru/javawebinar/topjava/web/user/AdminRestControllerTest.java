@@ -158,7 +158,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
     @Test
     void invalidUserUpdate() throws Exception {
         User invalidUser = getInvalidUserUpdate();
-        perform(MockMvcRequestBuilders.put(REST_URL + "100000")
+        perform(MockMvcRequestBuilders.put(REST_URL + USER_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(admin))
                 .content(jsonWithPassword(invalidUser, invalidUser.getPassword())))

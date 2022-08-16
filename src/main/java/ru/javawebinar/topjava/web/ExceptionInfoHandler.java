@@ -8,6 +8,9 @@ import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,18 +43,27 @@ public class ExceptionInfoHandler {
     public ErrorInfo conflict(HttpServletRequest req, DataIntegrityViolationException e) {
         Throwable rootCause = ValidationUtil.getRootCause(e);
         if (rootCause.toString().toLowerCase().contains("users_unique_email_idx")) {
-            return duplicateEmailErrorInfo(req);
+            return duplicateDataErrorInfo(req, rootCause, "User with this email already exists");
         }
         if (rootCause.toString().toLowerCase().contains("meals_unique_user_datetime_idx")) {
-            return duplicateDateTimeMeal(req);
+            return duplicateDataErrorInfo(req, rootCause, "Meal with this date time already exists");
         }
         return logAndGetErrorInfo(req, e, true, DATA_ERROR);
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)  // 422
-    @ExceptionHandler({IllegalRequestDataException.class, MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
+    @ExceptionHandler({MethodArgumentNotValidException.class, IllegalRequestDataException.class,
+            MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
     public ErrorInfo illegalRequestDataError(HttpServletRequest req, Exception e) {
         return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR);
+    }
+
+
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(BindException.class)
+    public ErrorInfo validationError(HttpServletRequest req, BindingResult bindingResult) {
+        return logAndGetErrorInfo(req, new IllegalRequestDataException(ValidationUtil.getErrorMessage(bindingResult)),
+                true, VALIDATION_ERROR);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -71,11 +83,8 @@ public class ExceptionInfoHandler {
         return new ErrorInfo(req.getRequestURL(), errorType, rootCause.getMessage());
     }
 
-    private static ErrorInfo duplicateEmailErrorInfo(HttpServletRequest req) {
-        return new ErrorInfo(req.getRequestURL(), DATA_ERROR, "User with this email already exists");
-    }
-
-    private ErrorInfo duplicateDateTimeMeal(HttpServletRequest req) {
-        return new ErrorInfo(req.getRequestURL(), DATA_ERROR, "Meal with this date time already exists");
+    private static ErrorInfo duplicateDataErrorInfo(HttpServletRequest req, Throwable rootCause, String detail) {
+        log.warn("{} at request  {}: {}", ErrorType.DATA_ERROR, req.getRequestURL(), rootCause.toString());
+        return new ErrorInfo(req.getRequestURL(), DATA_ERROR, detail);
     }
 }

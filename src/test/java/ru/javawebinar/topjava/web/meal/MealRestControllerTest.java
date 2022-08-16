@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.web.meal;
 
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -139,7 +138,7 @@ class MealRestControllerTest extends AbstractControllerTest {
     @Test
     void invalidDataUpdate() throws Exception {
         Meal invalidMeal = getInvalidateMealUpdate();
-        perform(MockMvcRequestBuilders.put(REST_URL + "/100003")
+        perform(MockMvcRequestBuilders.put(REST_URL + MEAL1_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(user))
                 .content(JsonUtil.writeValue(invalidMeal)))

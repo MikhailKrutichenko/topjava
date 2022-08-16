@@ -43,7 +43,7 @@ public class MealTestData {
     }
 
     public static Meal getInvalidateMealUpdate() {
-        return new Meal(100003, null, "R", 1);
+        return new Meal(MEAL1_ID, null, "R", 1);
     }
 
     public static Meal getDuplicateDateTime() {

@@ -42,8 +42,8 @@ public class ProfileRestController extends AbstractUserController {
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update(@Valid @RequestBody UserTo userTo, BindingResult result) {
-        ValidationUtil.validation(result);
+    public void update(@Valid @RequestBody UserTo userTo) {
+        //ValidationUtil.validateEntity(result);
         super.update(userTo, authUserId());
     }
 
